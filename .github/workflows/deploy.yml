@@ -1,6 +1,6 @@
 name: Reproduce Customer Docker Issue
 
-on: [ push]
+on: [ push ]
 
 jobs:
   container-test-job:
