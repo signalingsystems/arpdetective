@@ -1,8 +1,31 @@
-name: Hello World
-on: [push]
+name: Reproduce Customer Docker Issue
+
+on: [ push]
+
 jobs:
-  Hello-World-Job:
-    runs-on:
-      - codebuild-docker-test-${{ github.run_id }}-${{ github.run_attempt }}
+  container-test-job:
+    runs-on: codebuild-nexus-impress-ui-${{ github.run_id }}-${{ github.run_attempt }}
+    
+    # This is the customer's setup - container job that needs Docker access
+    container:
+      image: node:18-alpine  # Using public image instead of private artifactory
+    
     steps:
-      - run: echo "Hello World"
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Test Docker availability (this will fail)
+        run: |
+          echo "Testing Docker access from container job..."
+          echo "Node version: $(node --version)"
+          
+      - name: Try Docker commands (customer's exact issue)
+        run: |
+          echo "Attempting Docker operations that customer needs..."
+          /usr/bin/docker version --format '{{.Server.APIVersion}}'
+        continue-on-error: true
+        
+      - name: Show the exact error customer sees
+        run: |
+          echo "This should show: Cannot connect to the Docker daemon at unix:///var/run/docker.sock"
+          docker ps || echo "Docker daemon connection failed - this is the customer's issue"
