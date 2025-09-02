@@ -4,7 +4,8 @@ on: [ push ]
 
 jobs:
   container-test-job:
-    runs-on: codebuild-nexus-impress-ui-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on:
+      - codebuild-docker-test-${{ github.run_id }}-${{ github.run_attempt }}
     
     # This is the customer's setup - container job that needs Docker access
     container:
